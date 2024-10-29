@@ -469,17 +469,35 @@ class Exercise6Runner:
         )
         self.dev_df_multiclass = pd.read_csv(f"{data_dir}/sst/sst_dev_multiclass.csv")
 
-    def evaluate(self, k=5, st_model="all-mpnet-base-v2", return_vals=False):
+    def evaluate(self, k=5, debug=False, st_model="all-mpnet-base-v2", return_vals=False):
 
         print("Excercise 6: Sentence Transformer KNN Classifier")
         print("-----------------")
 
+        if debug:
+            print("Running on Debug Model. Will only use 100 examples in training and 10 examples for dev set")
+            print(" ")
+            train_sents = self.train_df["sentence"].values.tolist()[:100]
+            train_labels = self.train_df["label"].values.tolist()[:100]
+            train_labels_multi = self.train_df_multiclass["label"].values.tolist()[:100]
+            dev_sents = self.dev_df["sentence"].values.tolist()[:10]
+            dev_labels = self.dev_df["label"].values.tolist()[:10]
+            dev_labels_multi = self.dev_df_multiclass["label"].values.tolist()[:10]
+
+        else:
+            train_sents = self.train_df["sentence"].values.tolist()
+            train_labels = self.train_df["label"].values.tolist()
+            train_labels_multi = self.train_df_multiclass["label"].values.tolist()
+            dev_sents = self.dev_df["sentence"].values.tolist()
+            dev_labels = self.dev_df["label"].values.tolist()
+            dev_labels_multi = self.dev_df_multiclass["label"].values.tolist()
+        
         print(f"Binary Classification using k = {k} using Sentence Transformer")
         dev_acc_bc_st = self.get_knn_acc(
-            self.train_df["sentence"].values.tolist(),
-            self.train_df["label"].values.tolist(),
-            self.dev_df["sentence"].values.tolist(),
-            self.dev_df["label"].values.tolist(),
+            train_sents,
+            train_labels,
+            dev_sents,
+            dev_labels,
             st_model=st_model,
             k=k,
         )
@@ -490,10 +508,10 @@ class Exercise6Runner:
         print(f"Multiclass Classification using k = {k} using Sentence Transformer")
 
         dev_acc_bc_st = self.get_knn_acc(
-            self.train_df_multiclass["sentence"].values.tolist(),
-            self.train_df_multiclass["label"].values.tolist(),
-            self.dev_df_multiclass["sentence"].values.tolist(),
-            self.dev_df_multiclass["label"].values.tolist(),
+            train_sents,
+            train_labels_multi,
+            dev_sents,
+            dev_labels_multi,
             st_model=st_model,
             k=k,
         )
